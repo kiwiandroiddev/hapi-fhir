@@ -1,16 +1,13 @@
 package ca.uhn.fhir.model.primitive;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.TimeZone;
-import java.util.TreeSet;
-
+import ca.uhn.fhir.util.TestUtil;
 import org.junit.AfterClass;
 import org.junit.Test;
 
-import ca.uhn.fhir.util.TestUtil;
+import java.util.Calendar;
+import java.util.TimeZone;
+
+import static org.junit.Assert.assertEquals;
 
 public class DateDtTest {
 	private static final org.slf4j.Logger ourLog = org.slf4j.LoggerFactory.getLogger(DateDtTest.class);
@@ -58,7 +55,28 @@ public class DateDtTest {
 		dateDt = new DateDt(1990, 0, 5);
 		assertEquals("1990-01-05", dateDt.getValueAsString());
 	}
-	
-	
-	
+
+	@Test
+	public void testParseFromString() throws Exception {
+		DateDt dateDt = new DateDt("1990-01-01");
+
+		assertEquals(1990, getYear(dateDt));
+	}
+
+	@Test
+	public void testParseFromString_deviceTimeZoneChangeAfterParse() throws Exception {
+		TimeZone.setDefault(TimeZone.getTimeZone("GMT+12:00"));
+
+		DateDt dateDt = new DateDt("1990-01-01");
+
+		TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+		assertEquals(1990, getYear(dateDt));
+	}
+
+	public static int getYear(DateDt date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date.getValue());
+		return cal.get(Calendar.YEAR);
+	}
+
 }
